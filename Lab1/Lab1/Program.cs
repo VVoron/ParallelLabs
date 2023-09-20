@@ -42,13 +42,23 @@ public class LabFunctions
 
         for (int i = 0; i < numThreads; i++)
         {
+            var createThreadTime = DateTime.Now;
+
             int localIndex = i; // Создаем локальную копию переменной i
             threadsList.Add(new Thread(() =>
             {
                 results[localIndex] += Sum(fVector, sVector, numsForOneThread, localIndex);
             }));
+            var endCreateThreadTime = DateTime.Now;
+
+            // Чтобы убрать время на создание потока
+            startTime += endCreateThreadTime - createThreadTime;
+            
             threadsList[i].Start();
         }
+
+        foreach (var thread in threadsList)
+            thread.Start();
 
         foreach (var thread in threadsList)
             thread.Join();
