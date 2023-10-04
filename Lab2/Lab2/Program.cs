@@ -1,4 +1,6 @@
-﻿const int N = 10000000;
+﻿using System.Numerics;
+
+const int N = 10000000;
 
 var labFunc = new LabFunctions();
 
@@ -27,34 +29,24 @@ public class LabFunctions
         return vector;
     }
 
-    public void SumWithThreads(List<int> fVector, List<int> sVector,int numThreads)
+    public void SumWithThreads(List<int> fVector, List<int> sVector, int numThreads)
     {
         Console.WriteLine("--------------------------");
         Console.WriteLine($"Задача с кол-вом потоков - {numThreads}");
 
-        var threadsList = new List<Thread>();
+        var results = new int[fVector.Count];
 
         var numsForOneThread = fVector.Count / numThreads;
 
-        var results = new int[fVector.Count];
-
         var startTime = DateTime.Now;
 
-        for (int i = 0; i < numThreads; i++)
+        Parallel.For(0, numThreads, (i, x) =>
         {
-            int startIndex = i * numsForOneThread;
-            int endIndex = (i + 1) * numsForOneThread;
-            threadsList.Add(new Thread(() =>
+            for (int index = i * numsForOneThread; index < (i + 1) * numsForOneThread; index++)
             {
-                for (int index = startIndex; index < endIndex; index++)
-                    results[index] = fVector[index] + sVector[index];
-            }));
-            
-            threadsList[i].Start();
-        }
-
-        foreach (var thread in threadsList)
-            thread.Join();
+                results[index] = fVector[index] + sVector[index];
+            }
+        });
 
         var endTime = DateTime.Now;
 
